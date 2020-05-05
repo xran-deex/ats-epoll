@@ -1,0 +1,19 @@
+{
+  "name": "ats-epoll",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "ats-threadpool": "git+http://ubuntu-netfu:3000/randy.valis/ats-threadpool",
+    "shared_vt": "git+http://ubuntu-netfu:3000/randy.valis/shared_vt"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Randy Valis",
+  "license": "ISC"
+}
