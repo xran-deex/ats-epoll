@@ -11,6 +11,8 @@ staload "libats/libc/SATS/sys/socket_in.sats"
 staload "libats/libc/SATS/arpa/inet.sats"
 staload "libats/libc/SATS/netinet/in.sats"
 
+#include "ats-pthread-extensions/ats-pthread-ext.hats"
+
 staload $EPOLL
 
 %{#

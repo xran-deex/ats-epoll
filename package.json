@@ -7,6 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "ats-pthread-extensions": "git+http://ubuntu-netfu.lan:3000/randy.valis/ats-pthread-extensions.git",
     "ats-threadpool": "git+http://ubuntu-netfu:3000/randy.valis/ats-threadpool",
     "shared_vt": "git+http://ubuntu-netfu:3000/randy.valis/shared_vt"
   },
