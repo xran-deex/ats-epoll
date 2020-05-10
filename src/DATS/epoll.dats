@@ -21,9 +21,11 @@ implement{} setnonblocking(fd) = ret where {
     prval() = pf(fdes)
 }
 
-implement{} make_epoll() = res where {
-    val ep = epoll_create(1)
-    val res = E(@{ epoll=ep, running=false, watchers=hashtbl_make_nil(i2sz 100) })
+fn{} cleanup(p: ptr):<!wrt> void = {
+    prval () = $UNSAFE.cast2void(p)
+}
+
+fn{} watch_sig(e: !Epoll): void = {
     fun handle_signal(e: !Epoll, w: !Watcher, evs: uint): void = () where {
         val+@E(ep) = e
         val () = ep.running := false
@@ -39,11 +41,47 @@ implement{} make_epoll() = res where {
         val () = if fd > 0 then {
             val _ = setnonblocking(fd)
             val w = make_watcher(fd, handle_signal)
-            val () = register_watcher(res, w, EPOLLIN)
+            val () = register_watcher(e, w, EPOLLIN)
         }
     } else {
         prval() = opt_unnone(s)
     }
+}
+
+implement{} make_epoll() = res where {
+    val ep = epoll_create(1)
+    val res = E(@{ 
+        epoll=ep, 
+        running=false, 
+        watchers=hashtbl_make_nil(i2sz 100), 
+        data=the_null_ptr, 
+        cleanup=cleanup 
+    })
+    val () = watch_sig(res)
+}
+
+implement{a} make_epoll2(data) = res where {
+    val ep = epoll_create(1)
+    val res = E(@{ 
+        epoll=ep, 
+        running=false, 
+        watchers=hashtbl_make_nil(i2sz 100), 
+        data=$UNSAFE.castvwtp1{ptr}(data), 
+        cleanup=cleanup 
+    })
+    val () = watch_sig(res)
+}
+
+implement{a} make_epoll3(data, cleanup) = res where {
+    val ep = epoll_create(1)
+    val res = E(@{ 
+        epoll=ep, 
+        running=false, 
+        watchers=hashtbl_make_nil(i2sz 100), 
+        data=$UNSAFE.castvwtp0{ptr}(data), 
+        cleanup=$UNSAFE.castvwtp1{cleanup_func} cleanup 
+    })
+    val () = watch_sig(res)
 }
 
 #define MAX 1024
@@ -116,6 +154,27 @@ fn{} free_watcher(w: Watcher):<!wrt> void = {
 //     prval() = __ignore(pf)
 // }
 
+implement{a} epoll_data_takeout(e) = res where {
+    val+@E(epoll) = e
+    val null = epoll.data = the_null_ptr
+    val data = $UNSAFE.castvwtp1{a}(epoll.data)
+    val res = (if null then ret where {
+        val ret = None_vt()
+        prval () = $UNSAFE.cast2void(data)
+    } else Some_vt(data)): Option_vt(a)
+    val res = (epoll_v | res)
+    val () = epoll.data := $UNSAFE.castvwtp0{ptr}(0)
+    prval() = fold@(e)
+}
+
+implement{a} epoll_data_addback(pf | e, data) = {
+    val+@E(epoll) = e
+    val () = epoll.data := $UNSAFE.castvwtp0{ptr}(data)
+    prval() = fold@(e)
+    extern prfun __ignore{a:vt@ype}(p: epoll_v(a)): void
+    prval() = __ignore(pf)
+}
+
 implement{a} watcher_data_takeout(w) = res where {
     val+@W(watcher) = w
     val null = watcher.data = the_null_ptr
@@ -170,10 +229,7 @@ implement{} free_epoll(ep: epoll_): void = {
             val () = free_watcher(w.1)
         }
     }
-}
-
-fn{} cleanup(p: ptr):<!wrt> void = {
-    prval () = $UNSAFE.cast2void(p)
+    val () = e.cleanup(e.data)
 }
 
 implement{} make_watcher(fd, func) = 

@@ -52,12 +52,46 @@ fn test2(c: !Context): void = {
     val () = assert_equals1<int>(c, 0, 0)
 }
 
+fn test3(c: !Context): void = {
+    fn cb(e: !Epoll, w: !Watcher, evs: uint): void = {
+        val () = println! "hello world"
+        val c1 = getchar0()
+        val c2 = getchar0()
+        val (pf | opt) = epoll_data_takeout<strptr>(e)
+        val-~Some_vt(s) = opt
+        val s2 = copy("world")
+        val s3 = strptr_append(s, s2)
+        val () = println!(c1, s3)
+        val () = free(s)
+        val () = free(s2)
+        val () = epoll_data_addback<strptr>(pf | e, s3)
+        val () = if c1 = 'a' then stop_epoll(e)
+    }
+    vtypedef str = @{p=strptr}
+    val str = @{p=copy("hello")}
+    fn clean(s: str):<!wrt> void = {
+        val () = free(s.p)
+    }
+    val e = make_epoll3(str, clean)
+    val _ = setnonblocking(0)
+    val w = make_watcher(0, cb)
+    val () = register_watcher(e, w, EPOLLIN lor EPOLLET)
+    val () = run(e)
+    val (pf | opt) = epoll_data_takeout<strptr>(e)
+    val-~Some_vt(s) = opt
+    val () = println!("Final: ", s)
+    val () = epoll_data_addback<strptr>(pf | e, s)
+    val () = free_epoll(e)
+    val () = assert_equals1<int>(c, 0, 0)
+}
+
 implement main0() = {
     val r = create_runner()
     val s = create_suite("ats-epoll tests")
 
     val () = add_test(s, "test1", test1)
     val () = add_test(s, "test2", test2)
+    val () = add_test(s, "test3 - global data", test3)
 
     val () = add_suite(r, s)
     val () = run_tests(r)

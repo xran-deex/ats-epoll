@@ -43,14 +43,20 @@ typedef callback = (!Epoll, !Watcher, uint) -<fun1> void
 typedef cleanup_func = (ptr) -<fun0,!wrt> void
 vtypedef epoll_watcher = [n:int | n >= 0] @{ fd=int(n), handler= callback, data=ptr, cleanup=cleanup_func }
 datavtype watcher_ = W of epoll_watcher
-vtypedef epoll_ctx = @{ epoll=epoll_fd, running=bool, watchers=hashtbl(int, watcher_) }
-
+vtypedef epoll_ctx = @{ epoll=epoll_fd, running=bool, watchers=hashtbl(int, watcher_), data=ptr, cleanup=cleanup_func }
 datavtype epoll_ = E of epoll_ctx
 
 fn{} make_epoll(): Epoll
-fn{} free_epoll(d: Epoll): void
+fn{a:vt@ype} make_epoll2(data: !a): Epoll
+fn{a:vt@ype} make_epoll3(data: a, cleanup: (a) -<fun0,!wrt> void): Epoll
+fn{} free_epoll(e: Epoll): void
 fn{} run(epoll: !Epoll): void
 fn{} stop_epoll(epoll: !Epoll): void
+
+// for getting any data associated with the watcher
+dataview epoll_v(a:vt@ype) = epoll_v
+fn{a:vt@ype} epoll_data_takeout(e: !Epoll): (epoll_v(a) | Option_vt(a))
+fn{a:vt@ype} epoll_data_addback(pf: epoll_v(a) | e: !Epoll, data: a): void
 
 // make a watcher that watches fd
 fn{} make_watcher{n:int|n>=0}(fd: int(n), func: callback): Watcher
