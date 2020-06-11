@@ -13,11 +13,5 @@ set(CMAKE_C_FLAGS "-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -g -O2")
 ATS_COMPILE (TEST_SRC
 	tests.dats
 )
-ATS_COMPILE (MAIN_SRC
-	main.dats
-)
-ADD_EXECUTABLE(main ${MAIN_SRC})
 ADD_EXECUTABLE(tests ${TEST_SRC})
-TARGET_INCLUDE_DIRECTORIES(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src")
-target_link_libraries(main atslib pthread)
-target_link_libraries(tests atslib pthread)
+target_link_libraries(tests pthread ats-epoll atslib)

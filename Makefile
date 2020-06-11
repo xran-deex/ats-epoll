@@ -3,7 +3,7 @@ ATSOPT=$(PATSHOME)/bin/patsopt
 
 ATSFLAGS=-IATS node_modules -IATS ../node_modules
 
-CFLAGS=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O3 -fpic
+CFLAGS=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O3
 LIBS=-latslib
 
 APP     = libats-epoll.a
@@ -14,6 +14,9 @@ ifndef STATICLIB
 endif
 
 EXEDIR  = target
+ifdef OUTDIR
+	EXEDIR = $(OUTDIR)
+endif
 SRCDIR  = src
 OBJDIR  = .build
 vpath %.dats src
