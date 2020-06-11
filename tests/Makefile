@@ -4,7 +4,7 @@ ATSOPT=$(PATSHOME)/bin/patsopt
 ATSFLAGS=-IATS node_modules -IATS ../node_modules
 
 CFLAGS=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I . -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O3 -g
-LIBS=-lpthread -L ../target -lats-epoll -latslib
+LIBS=-L $(PATSHOME)/ccomp/atslib/lib -L ../target -lats-epoll -latslib
 
 APP     = tests
 EXEDIR  = target
