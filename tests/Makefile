@@ -28,9 +28,12 @@ $(OBJDIR)/%.o: %.c
 	$(dir_guard)
 	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(@F)
 
-$(OBJDIR)/%.c: %.dats
+$(OBJDIR)/%.c: %.dats node_modules
 	$(dir_guard)
 	$(ATSOPT) $(ATSFLAGS) -o $(OBJDIR)/$(@F) -d $<
+
+node_modules: 
+	npm install
 
 RMF=rm -f
 

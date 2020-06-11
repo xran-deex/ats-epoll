@@ -55,6 +55,8 @@ clean:
 	$(RMF) $(OBJS)
 	+make -C tests clean
 
-test: all
+buildall: all
 	+make -C tests
+
+test: buildall
 	+make -C tests run
