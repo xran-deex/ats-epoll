@@ -38,7 +38,7 @@ vtypedef Epoll(a:vt@ype) = Epoll_vtype(a)
 absvtype Watcher_vtype(a:vt@ype,b:vt@ype)
 vtypedef Watcher(a:vt@ype,b:vt@ype) = Watcher_vtype(a,b)
 typedef callback(a:vt@ype,b:vt@ype) = (!Epoll(a), !Watcher(a,b), uint) -<fun1> void
-vtypedef epoll_watcher(a:vt@ype,b:vt@ype) = [n:int | n >= 0] @{ fd=int(n), handler= callback(a,b), data=Option_vt(b), clear=(Option_vt(b))-<fun0,!wrt>void }
+vtypedef epoll_watcher(a:vt@ype,b:vt@ype) = [n:int | n >= 0] @{ fd=int(n), handler= callback(a,b), data=Option_vt(b), clear=(Option_vt(b))-<fun0,!wrt> void }
 datavtype watcher_(a:vt@ype,b:vt@ype) = W of epoll_watcher(a,b)
 vtypedef epoll_ctx(a:vt@ype) = @{ epoll=epoll_fd, running=bool, watchers=hashtbl(int, [b:vt@ype] watcher_(a,b)), data=Option_vt(a) }
 datavtype epoll_(a:vt@ype) = E of epoll_ctx(a)
