@@ -6,3 +6,12 @@ steps:
   image: ubuntu-netfu:5000/ats:0.4.0-npm
   commands:
   - make buildall
+
+- name: release
+  image: plugins/gitea-release
+  settings:
+    api_key:
+      from_secret: gitea_token
+    base_url: http://ubuntu-netfu:3000/
+    files: target/*
+    insecure: true
