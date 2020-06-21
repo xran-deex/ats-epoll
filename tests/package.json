@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ats-unit-testing": "git+http://ubuntu-netfu:3000/randy.valis/ats-unit-testing"
+    "ats-unit-testing": "git+https://github.com/xran-deex/ats-unit-testing#v0.1.0"
   }
 }

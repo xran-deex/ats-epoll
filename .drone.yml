@@ -3,14 +3,6 @@ name: default
 
 steps:
 - name: build
-  image: ubuntu-netfu:5000/ats:0.4.0-npm
+  image: xrandeex/ats2:0.4.0
   commands:
   - make buildall
-
-# - name: release
-#   image: plugins/gitea-release
-#   settings:
-#     api_key: 60b6ce7b414042c76c23c30fa20a50d4d7e76918
-#     base_url: http://ubuntu-netfu:3000/
-#     files: target/*
-#     insecure: true
