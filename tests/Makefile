@@ -1,45 +1,42 @@
 ATSCC=$(PATSHOME)/bin/patscc
 ATSOPT=$(PATSHOME)/bin/patsopt
 
-ATSFLAGS=-IATS node_modules -IATS ../node_modules
+ATSFLAGS+=
 
-CFLAGS=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I . -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O3 -g
-LIBS=-L $(PATSHOME)/ccomp/atslib/lib -L ../target -lats-epoll -latslib
+CFLAGS+=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O2 -I src
+LDFLAGS+=-L $(PATSHOME)/ccomp/atslib/lib
+LIBS+=-latslib
 
-APP     = tests
-EXEDIR  = target
-SRCDIR  = .
-OBJDIR  = .build
-vpath %.dats .
-dir_guard=@mkdir -p $(@D)
-SRCS    := tests.dats
-OBJS    := $(patsubst %.dats,$(OBJDIR)/%.o,$(SRCS))
+NAME := tests
+SRCDIR  := 
+vpath %.dats src
+vpath %.dats src/DATS
+vpath %.sats src/SATS
+SRCS    := $(shell find $(SRCDIR) -name '*.dats' -type f -exec basename {} \;)
+DDIR    :=  build
+OBJ    := $(patsubst %.dats,$(DDIR)/%.o,$(SRCS))
 
-.PHONY: clean setup
+.PHONY: all clean fclean re 
 
-all: $(EXEDIR)/$(APP)
+all: $(NAME)
 
-$(EXEDIR)/$(APP): $(OBJS)
-	$(dir_guard)
-	$(CC) $(CFLAGS) -o $(EXEDIR)/$(APP) $(OBJS) $(LIBS)
+$(NAME): $(OBJ)
+	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
-.SECONDEXPANSION:
-$(OBJDIR)/%.o: %.c
-	$(dir_guard)
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(@F)
+$(DDIR)/%.o: %.c | $(DDIR)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(OBJDIR)/%.c: %.dats node_modules
-	$(dir_guard)
-	$(ATSOPT) $(ATSFLAGS) -o $(OBJDIR)/$(@F) -d $<
+%.c: %.dats
+	$(ATSOPT) $(ATSFLAGS) -o $(@F) -d $<
 
-node_modules: 
-	npm install
+$(SDIR) $(DDIR):
+	@mkdir $@
 
-RMF=rm -f
+clean:
+	$(RM) -r $(SDIR) $(DDIR)
 
-clean: 
-	$(RMF) $(EXEDIR)/$(APP)
-	$(RMF) $(OBJS)
+fclean: clean
+	$(RM) $(NAME)
 
-run:
-	LD_LIBRARY_PATH=../target ./target/tests
+re: fclean all
+

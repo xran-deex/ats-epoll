@@ -1,62 +1,54 @@
 ATSCC=$(PATSHOME)/bin/patscc
 ATSOPT=$(PATSHOME)/bin/patsopt
 
-ATSFLAGS=
+ATSFLAGS+=-IATS src
 
-CFLAGS=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O3
-LIBS=-L $(PATSHOME)/ccomp/atslib/lib -latslib
+CFLAGS+=-DATS_MEMALLOC_LIBC -D_DEFAULT_SOURCE -I $(PATSHOME)/ccomp/runtime -I $(PATSHOME) -O2 -I src -fno-stack-protector
+LDFLAGS+=-L $(PATSHOME)/ccomp/atslib/lib
+LIBS+=-latslib
 
-APP     = libats-epoll.a
-ifndef STATICLIB
-	CFLAGS+=-fpic
-	LIBS+=-shared
-	APP     = libats-epoll.so
-endif
-
-EXEDIR  = target
-ifdef OUTDIR
-	EXEDIR = $(OUTDIR)
-endif
-SRCDIR  = src
-OBJDIR  = .build
+NAME := libats-epoll
+SNAME   :=  $(NAME).a
+DNAME   :=  $(NAME).so
+SRCDIR  := src
 vpath %.dats src
 vpath %.dats src/DATS
 vpath %.sats src/SATS
-dir_guard=@mkdir -p $(@D)
 SRCS    := $(shell find $(SRCDIR) -name '*.dats' -type f -exec basename {} \;)
-OBJS    := $(patsubst %.dats,$(OBJDIR)/%.o,$(SRCS))
+SDIR    :=  build-static
+SOBJ    := $(patsubst %.dats,$(SDIR)/%.o,$(SRCS))
+DDIR    :=  build-shared
+DOBJ    := $(patsubst %.dats,$(DDIR)/%.o,$(SRCS))
 
-.PHONY: clean setup
+.PHONY: all clean fclean re 
 
-all: $(EXEDIR)/$(APP)
+all: $(SNAME) $(DNAME)
 
-$(EXEDIR)/$(APP): $(OBJS)
-	$(dir_guard)
-ifdef STATICLIB
-	ar rcs $@ $(OBJS)
-endif
-ifndef STATICLIB
-	$(CC) $(CFLAGS) -o $(EXEDIR)/$(APP) $(OBJS) $(LIBS)
-endif
+$(SNAME): $(SOBJ)
+	$(AR) $(ARFLAGS) $@ $^
 
-.SECONDEXPANSION:
-$(OBJDIR)/%.o: %.c
-	$(dir_guard)
-	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$(@F)
+$(DNAME): CFLAGS += -fPIC
+$(DNAME): LDFLAGS += -shared
+$(DNAME): $(DOBJ)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-$(OBJDIR)/%.c: %.dats
-	$(dir_guard)
-	$(ATSOPT) $(ATSFLAGS) -o $(OBJDIR)/$(@F) -d $<
+$(SDIR)/%.o: %.c | $(SDIR)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-RMF=rm -f
+$(DDIR)/%.o: %.c | $(DDIR)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-clean: 
-	$(RMF) $(EXEDIR)/$(APP)
-	$(RMF) $(OBJS)
-	+make -C tests clean
+%.c: %.dats
+	$(ATSOPT) $(ATSFLAGS) -o $(@F) -d $<
 
-buildall: all
-	+make -C tests
+$(SDIR) $(DDIR):
+	@mkdir $@
 
-test: buildall
-	+make -C tests run
+clean:
+	$(RM) -r $(SDIR) $(DDIR)
+
+fclean: clean
+	$(RM) $(SNAME) $(DNAME)
+
+re: fclean all
+

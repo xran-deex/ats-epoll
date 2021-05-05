@@ -1,8 +1,13 @@
 #include "./../HATS/includes.hats"
 staload "./../SATS/epoll.sats"
 staload "libats/libc/SATS/errno.sats"
+staload "libats/libc/SATS/fcntl.sats"
+staload "libats/libc/SATS/stdio.sats"
+staload "libats/libc/SATS/signal.sats"
+staload "libats/SATS/hashtbl_chain.sats"
+staload "libats/libc/SATS/unistd.sats"
 #define ATS_DYNLOADFLAG 0
-#define ATS_EXTERN_PREFIX "epoll_"
+#define ATS_EXTERN_PREFIX "ats-epoll"
 
 assume Epoll_vtype(a:vt@ype) = epoll_(a)
 assume Watcher_vtype(a:vt@ype,b:vt@ype) = watcher_(a,b)

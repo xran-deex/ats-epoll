@@ -1,4 +1,9 @@
 #include "./../HATS/includes.hats"
+#define ATS_PACKNAME "ats-epoll"
+staload "libats/libc/SATS/fcntl.sats"
+staload "libats/libc/SATS/stdio.sats"
+staload "libats/libc/SATS/signal.sats"
+staload "libats/SATS/hashtbl_chain.sats"
 
 typedef fd = int
 typedef epoll_fd = int

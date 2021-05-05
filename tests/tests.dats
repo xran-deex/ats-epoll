@@ -1,8 +1,9 @@
-#include "../ats-epoll.hats"
-#include "ats-unit-testing/ats-unit-testing.hats"
+#include "ats-epoll.hats"
+#include "ats-unit-testing.hats"
 staload "libats/libc/SATS/stdio.sats"
 
 staload $EPOLL
+staload $UT
 
 fn test1(c: &Context): void = {
     fn cb(e: !Epoll(Context), w: !Watcher(Context,void), evs: uint): void = {
