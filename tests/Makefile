@@ -1,3 +1,4 @@
+-include build/conanbuildinfo.mak
 ATSCC=$(PATSHOME)/bin/patscc
 ATSOPT=$(PATSHOME)/bin/patsopt
 
@@ -13,7 +14,7 @@ vpath %.dats src
 vpath %.dats src/DATS
 vpath %.sats src/SATS
 SRCS    := $(shell find $(SRCDIR) -name '*.dats' -type f -exec basename {} \;)
-DDIR    :=  build
+DDIR    := .build
 OBJ    := $(patsubst %.dats,$(DDIR)/%.o,$(SRCS))
 
 .PHONY: all clean fclean re 
