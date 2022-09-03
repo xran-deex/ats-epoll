@@ -59,7 +59,7 @@ fn stop_epoll{a:vt@ype}(epoll: !Epoll(a)): void
 // for getting any data associated with the watcher
 dataview epoll_v(a:vt@ype) = epoll_v
 fn{a:vt@ype} epoll_data_takeout(e: !Epoll(a)): (epoll_v(a) | Option_vt(a))
-fn{a:vt@ype} epoll_data_addback(pf: epoll_v(a) | e: !Epoll(a), data: a): void
+fn{a:vt@ype} epoll_data_addback(pf: epoll_v(a) | e: !Epoll(a), data: Option_vt(a)): void
 
 // make a watcher that watches fd
 fn make_watcher{n:int|n>=0;a,b:vt@ype}(fd: int(n), func: callback(a,b)): Watcher(a,b)
@@ -74,4 +74,4 @@ fn watcher_get_fd{a,b:vt@ype}(w: !Watcher(a,b)): [n:int | n >= 0] int(n)
 // for getting any data associated with the watcher
 dataview watcher_v(a:vt@ype) = watcher_v
 fn{b:vt@ype} watcher_data_takeout{a:vt@ype}(w: !Watcher(a,b)): (watcher_v(b) | Option_vt(b))
-fn{b:vt@ype} watcher_data_addback{a:vt@ype}(pf: watcher_v(b) | w: !Watcher(a,b), data: b): void
+fn{b:vt@ype} watcher_data_addback{a:vt@ype}(pf: watcher_v(b) | w: !Watcher(a,b), data: Option_vt(b)): void

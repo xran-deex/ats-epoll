@@ -11,9 +11,10 @@ fn test1(c: &Context): void = {
         val c1 = getchar0()
         val c2 = getchar0()
         val (pf | opt) = epoll_data_takeout<Context>(e)
-        val-~Some_vt(c) = opt
+        val-@Some_vt(c) = opt
         val () = assert_equals1<int>(c, 97, c1)
-        val () = epoll_data_addback(pf | e, c)
+        prval () = fold@opt
+        val () = epoll_data_addback(pf | e, opt)
         val () = stop_epoll(e)
     }
     val e = make_epoll1<Context>(c)
@@ -40,8 +41,8 @@ fn test2(c: &Context): void = {
         val () = free(s2)
         val () = s.p := s3
         prval () = fold@opt
-        val-~Some_vt(s) = opt
-        val () = watcher_data_addback<str>(pf | w, s)
+        // val-~Some_vt(s) = opt
+        val () = watcher_data_addback<str>(pf | w, opt)
         val () = if c1 = 'a' then stop_epoll(e)
     }
     val e = make_epoll()
@@ -74,8 +75,8 @@ fn test3(c: &Context): void = {
         val () = free(s2)
         val () = s.p := s3
         prval () = fold@opt
-        val-~Some_vt(s) = opt
-        val () = epoll_data_addback<str>(pf | e, s)
+        // val-Some_vt(s) = opt
+        val () = epoll_data_addback<str>(pf | e, opt)
         val () = if c1 = 'a' then stop_epoll(e)
     }
     val str = @{p=copy("hello")}
@@ -85,9 +86,10 @@ fn test3(c: &Context): void = {
     val () = register_watcher(e, w, EPOLLIN lor EPOLLET)
     val () = run(e)
     val (pf | opt) = epoll_data_takeout<str>(e)
-    val-~Some_vt(s) = opt
+    val-@Some_vt(s) = opt
     val () = println!("Final: ", s.p)
-    val () = epoll_data_addback<str>(pf | e, s)
+    prval () = fold@opt
+    val () = epoll_data_addback<str>(pf | e, opt)
     val-~Some_vt(s) = free_epoll(e)
     val () = free(s.p)
     val () = assert_equals1<int>(c, 0, 0)

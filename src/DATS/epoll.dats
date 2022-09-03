@@ -149,7 +149,7 @@ implement{a} epoll_data_takeout(e) = res where {
 implement{a} epoll_data_addback(pf | e, data) = {
     val+@E(epoll) = e
     val-~None_vt() = epoll.data
-    val () = epoll.data := Some_vt(data) 
+    val () = epoll.data := data
     prval() = fold@(e)
     extern prfun __ignore(p: epoll_v(a)): void
     prval() = __ignore(pf)
@@ -165,7 +165,7 @@ implement{b} watcher_data_takeout(w) = res where {
 implement{b} watcher_data_addback{a}(pf | w, data) = {
     val+@W(watcher) = w
     val-~None_vt() = watcher.data
-    val () = watcher.data := Some_vt(data)
+    val () = watcher.data := data
     prval() = fold@(w)
     extern prfun __ignore(p: watcher_v(b)): void
     prval() = __ignore(pf)
